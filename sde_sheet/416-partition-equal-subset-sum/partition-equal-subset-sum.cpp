@@ -1,27 +1,30 @@
 class Solution {
 public:
-bool subsetSum(vector<int> &arr, int sum, int n) {
-    vector<bool> dp(sum + 1, false);
+    bool subsetsum(int ind, int target, vector<int>& nums, vector<vector<int>>& dp) {
+        if (target == 0) return true;
+        if (ind == nums.size()) return false;
 
-    // Base case: sum 0 is always possible
-    dp[0] = true;
+        if (dp[ind][target] != -1) return dp[ind][target];
 
-    for (int i = 0; i < n; i++) {
-        // Traverse backwards to avoid using the same element multiple times
-        for (int j = sum; j >= arr[i]; j--) {
-            dp[j] = dp[j] || dp[j - arr[i]];
-        }
+        bool pick = false;
+        if (nums[ind] <= target)
+            pick = subsetsum(ind + 1, target - nums[ind], nums, dp);
+
+        bool notpick = subsetsum(ind + 1, target, nums, dp);
+
+        return dp[ind][target] = (pick || notpick);
     }
 
-    return dp[sum];
-}
     bool canPartition(vector<int>& nums) {
-     int n = nums.size();
-     int sum =0;
-     for(int i=0 ;i <n;i++){
-        sum += nums[i];
-     }   
-     if(sum % 2 != 0 ) return false;
-     else return subsetSum(nums ,sum/2 ,n);
+        int n = nums.size();
+        int sum = 0;
+        for (int x : nums) sum += x;
+
+        if (sum % 2 != 0) return false;
+
+        int target = sum / 2;
+        vector<vector<int>> dp(n, vector<int>(target + 1, -1));
+
+        return subsetsum(0, target, nums, dp);
     }
 };
